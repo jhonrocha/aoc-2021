@@ -33,7 +33,7 @@ pub fn challenge2(path: &str) -> isize {
             ["forward", v] => {
                 let x = v.parse::<isize>().unwrap();
                 directions.0 += x;
-                directions.1 += (directions.2 * x);
+                directions.1 += directions.2 * x;
             }
             _ => (),
         };
