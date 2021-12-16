@@ -1,89 +1,76 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::fs::read_to_string;
 
-fn check_board(mut board: Vec<Num>, key: &str, line_size: usize) -> bool {
-    for (idx, Num(k, f)) in board.iter_mut().enumerate() {
-        if k == key {
-            *f = true;
-        }
-    }
-    false
-}
-
-struct Num(String, bool);
-struct Board {
-    houses: Vec<Num>,
-    dimensions: (usize, usize),
-}
-
-impl Board {
-    // add code here
-    fn new() -> Board {
-        Board {
-            houses: Vec::<Num>::new(),
-            dimensions: (0, 0),
-        }
-    }
-}
-
-pub fn part1(path: &str) -> usize {
-    let file = File::open(path).expect(&format!("Could not open file {}", path));
-    let reader = BufReader::new(file);
-    let mut lines = reader.lines();
-    let first_line = lines.next().expect("Could not read any line").unwrap();
-
-    let mut b_set: Vec<Board> = Vec::new();
-    let mut board = Board::new();
-    let mut count_columns = 0;
-    let mut count_lines = 0;
-    for line in lines {
-        let line = line.expect("Could not read a line");
-        if line.len() == 0 {
-            if count_columns > 0 {
-                board.dimensions = (count_lines, count_columns);
-                b_set.push(board);
-                board = Board::new();
-                count_lines = 0;
-            }
-        } else {
-            count_lines += 1;
-            count_columns = 0;
-            line.split_whitespace().for_each(|key| {
-                count_columns += 1;
-                board.houses.push(Num(key.to_string(), false));
-            });
-        }
-    }
-    first_line.split(",").find(|&k| {
-        for board in b_set {
-            let (lines, columns) = board.dimensions;
-            let mut lines_check = vec![true; lines];
-            let mut columns_check = vec![true; columns];
-            for (idx, &mut Num(key, found)) in board.houses.iter_mut().enumerate() {
-                println!("------------>{:?}: {:?}", key, found);
-                if k == key {
-                    found = true;
-                    println!("K: {:?}, key: {:?}, found: {:?}", k, key, found);
+pub fn part1(path: &str) -> u32 {
+    let lines = read_to_string(path).expect("File not found");
+    let (plays, boards) = lines.split_once("\n").expect("Wrong file");
+    let plays: Vec<&str> = plays.split(",").collect();
+    let mut boards: Vec<Vec<&str>> = boards
+        .split("\n\n")
+        .map(|b| b.trim().split_whitespace().collect())
+        .collect();
+    let mut winner: u32 = 0;
+    plays.iter().find(|&k| {
+        for board in boards.iter_mut() {
+            let mut lines = vec![true; 5];
+            let mut col = vec![true; 5];
+            for (idx, hs) in board.iter_mut().enumerate() {
+                if hs == k {
+                    *hs = "-";
                 }
-                lines_check[idx % lines] = found && lines_check[idx % lines];
-                columns_check[idx / columns] = found && columns_check[idx % columns];
+                lines[idx % 5] = lines[idx % 5] && (*hs == "-");
+                col[idx / 5] = col[idx / 5] && (*hs == "-");
             }
-            if let Some(found) = lines_check.iter().find(|&&l| !l) {
-                return true;
+            if let Some(found) = lines.iter().find(|&l| *l) {
+                winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
+                let mult: u32 = k.parse().unwrap();
+                winner *= mult;
+                break;
+            } else if let Some(found) = col.iter().find(|&c| *c) {
+                winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
+                let mult: u32 = k.parse().unwrap();
+                winner *= mult;
+                break;
             }
-            println!("Lines: {:?}", lines_check);
-            println!("Columns: {:?}", columns_check);
-            false
+        }
+        winner != 0
+    });
+    winner
+}
+
+pub fn part2(path: &str) -> u32 {
+    let lines = read_to_string(path).expect("File not found");
+    let (plays, boards) = lines.split_once("\n").expect("Wrong file");
+    let plays: Vec<&str> = plays.split(",").collect();
+    let mut boards: Vec<Vec<&str>> = boards
+        .split("\n\n")
+        .map(|b| b.trim().split_whitespace().collect())
+        .collect();
+    let mut winner: u32 = 0;
+    let mut ignore = Vec::<usize>::new();
+    plays.iter().find(|&k| {
+        for (n_pos, board) in boards.iter_mut().enumerate() {
+            if ignore.iter().find(|&&v| v == n_pos).is_some() {
+                continue;
+            }
+            let mut lines = vec![true; 5];
+            let mut col = vec![true; 5];
+            for (idx, hs) in board.iter_mut().enumerate() {
+                if hs == k {
+                    *hs = "-";
+                }
+                lines[idx % 5] = lines[idx % 5] && (*hs == "-");
+                col[idx / 5] = col[idx / 5] && (*hs == "-");
+            }
+            if lines.iter().find(|&l| *l).is_some() || col.iter().find(|&c| *c).is_some() {
+                winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
+                let mult: u32 = k.parse().unwrap();
+                winner *= mult;
+                ignore.push(n_pos);
+            }
         }
         false
     });
-    198
-}
-
-pub fn part2(path: &str) -> usize {
-    0
+    winner
 }
 
 #[cfg(test)]
@@ -91,25 +78,21 @@ mod anything {
     // use super::{part1, part2};
     use super::*;
     #[test]
-    // #[ignore]
     fn test_part1() {
-        assert_eq!(part1("./src/day4/test.txt"), 198);
+        assert_eq!(part1("./src/day4/test.txt"), 4512);
     }
 
     #[test]
-    #[ignore]
     fn run_part1() {
         println!("Part1 result is {}", part1("./src/day4/input.txt"))
     }
 
     #[test]
-    #[ignore]
     fn test_part2() {
-        assert_eq!(part2("./src/day4/test.txt"), 230);
+        assert_eq!(part2("./src/day4/test.txt"), 1924);
     }
 
     #[test]
-    #[ignore]
     fn run_part2() {
         println!("Part2 result is {}", part2("./src/day4/input.txt"))
     }
