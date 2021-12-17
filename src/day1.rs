@@ -1,5 +1,6 @@
 use std::fs;
 
+#[allow(dead_code)]
 pub fn challenge1() {
     let content = fs::read_to_string("./day1-1.txt").expect("File not found");
     let mut entries: [isize; 3] = [0, 0, 0];
@@ -16,6 +17,7 @@ pub fn challenge1() {
     println!("{}", counter);
 }
 
+#[allow(dead_code)]
 pub fn challenge2() {
     let content = fs::read_to_string("./day1-1.txt").expect("File not found");
     let mut entries: [isize; 3] = [0, 0, 0];

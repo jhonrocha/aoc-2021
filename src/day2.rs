@@ -3,6 +3,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+#[allow(dead_code)]
 pub fn challenge1(path: &str) -> isize {
     let f = File::open(path).expect(&format!("Could no open file {}", path));
     let reader = BufReader::new(f);
@@ -20,6 +21,7 @@ pub fn challenge1(path: &str) -> isize {
     directions.0 * directions.1
 }
 
+#[allow(dead_code)]
 pub fn challenge2(path: &str) -> isize {
     let f = File::open(path).expect(&format!("Could no open file {}", path));
     let reader = BufReader::new(f);

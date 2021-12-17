@@ -4,6 +4,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+#[allow(dead_code)]
 fn bin_to_dec(value: &Vec<char>) -> usize {
     let mut resp: usize = 0;
     value.iter().rev().enumerate().for_each(|(index, v)| {
@@ -13,12 +14,13 @@ fn bin_to_dec(value: &Vec<char>) -> usize {
     });
     resp
 }
+
+#[allow(dead_code)]
 pub fn part1(path: &str) -> usize {
     let file = File::open(path).expect(&format!("Could not open file {}", path));
     let reader = BufReader::new(file);
     let mut columns = Vec::new();
     let mut lines: usize = 0;
-
     reader.lines().for_each(|line| {
         let line = line.expect("Could not read a line");
         line.chars().enumerate().for_each(|(index, val)| {
@@ -47,6 +49,7 @@ pub fn part1(path: &str) -> usize {
     gamma * epsilon
 }
 
+#[allow(dead_code)]
 pub fn part2(path: &str) -> usize {
     let file = File::open(path).expect(&format!("Could not open file {}", path));
     let reader = BufReader::new(file);

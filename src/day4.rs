@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
 
+#[allow(dead_code)]
 pub fn part1(path: &str) -> u32 {
     let lines = read_to_string(path).expect("File not found");
     let (plays, boards) = lines.split_once("\n").expect("Wrong file");
@@ -20,12 +21,7 @@ pub fn part1(path: &str) -> u32 {
                 lines[idx % 5] = lines[idx % 5] && (*hs == "-");
                 col[idx / 5] = col[idx / 5] && (*hs == "-");
             }
-            if let Some(found) = lines.iter().find(|&l| *l) {
-                winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
-                let mult: u32 = k.parse().unwrap();
-                winner *= mult;
-                break;
-            } else if let Some(found) = col.iter().find(|&c| *c) {
+            if lines.iter().find(|&l| *l).is_some() || col.iter().find(|&c| *c).is_some() {
                 winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
                 let mult: u32 = k.parse().unwrap();
                 winner *= mult;
@@ -37,6 +33,7 @@ pub fn part1(path: &str) -> u32 {
     winner
 }
 
+#[allow(dead_code)]
 pub fn part2(path: &str) -> u32 {
     let lines = read_to_string(path).expect("File not found");
     let (plays, boards) = lines.split_once("\n").expect("Wrong file");
