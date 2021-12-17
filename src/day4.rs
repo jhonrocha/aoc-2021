@@ -79,21 +79,21 @@ mod anything {
     use super::*;
     #[test]
     fn test_part1() {
-        assert_eq!(part1("./src/day4/test.txt"), 4512);
+        assert_eq!(part1("fixtures/day4-test.txt"), 4512);
     }
 
     #[test]
     fn run_part1() {
-        println!("Part1 result is {}", part1("./src/day4/input.txt"))
+        println!("Part1 result is {}", part1("fixtures/day4.txt"))
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2("./src/day4/test.txt"), 1924);
+        assert_eq!(part2("fixtures/day4-test.txt"), 1924);
     }
 
     #[test]
     fn run_part2() {
-        println!("Part2 result is {}", part2("./src/day4/input.txt"))
+        println!("Part2 result is {}", part2("fixtures/day4.txt"))
     }
 }
