@@ -8,8 +8,8 @@ use std::{
 
 #[derive(Debug)]
 struct Line {
-    origin: (usize, usize),
-    end: (usize, usize),
+    origin: (isize, isize),
+    end: (isize, isize),
 }
 
 impl FromStr for Line {
@@ -21,11 +21,11 @@ impl FromStr for Line {
             .map(|v| {
                 let nums: Vec<&str> = v.split(",").collect();
                 (
-                    nums[0].parse::<usize>().unwrap(),
-                    nums[1].parse::<usize>().unwrap(),
+                    nums[0].parse::<isize>().unwrap(),
+                    nums[1].parse::<isize>().unwrap(),
                 )
             })
-            .collect::<Vec<(usize, usize)>>();
+            .collect::<Vec<(isize, isize)>>();
         Ok(Line {
             origin: points[0],
             end: points[1],
@@ -33,50 +33,78 @@ impl FromStr for Line {
     }
 }
 
-pub fn part1(path: &str) -> usize {
-    let rows = read_to_string(path)
+fn read_lines(path: &str) -> Vec<Line> {
+    read_to_string(path)
         .expect("File not found")
         .lines()
         .map(|l| l.parse::<Line>().unwrap())
         .collect::<Vec<Line>>()
+}
+
+fn part1(path: &str) -> usize {
+    let rows = read_lines(path)
         .iter()
         .fold(HashMap::new(), |mut hash, line| {
             if line.origin.0 == line.end.0 {
                 let begin = min(line.origin.1, line.end.1);
                 let end = max(line.origin.1, line.end.1) + 1;
-                println!("{:?}", line);
-                println!("Begin {:?}", begin);
-                println!("End {:?}", end);
                 for i in begin..end {
-                    let count = hash.entry((i, line.origin.1)).or_insert(0);
-                    println!("i {:?}", i);
+                    let count = hash.entry((line.origin.0, i)).or_insert(0);
                     *count += 1;
-                    println!("count {:?}", count);
                 }
             } else if line.origin.1 == line.end.1 {
                 let begin = min(line.origin.0, line.end.0);
                 let end = max(line.origin.0, line.end.0) + 1;
-                println!("{:?}", line);
-                println!("Begin {:?}", begin);
-                println!("End {:?}", end);
                 for i in begin..end {
-                    println!("i {:?}", i);
-                    let count = hash.entry((line.origin.0, i)).or_insert(0);
+                    let count = hash.entry((i, line.origin.1)).or_insert(0);
                     *count += 1;
-                    println!("count {:?}", count);
                 }
             }
             hash
         });
-    println!("{:?}", rows);
     rows.values().filter(|&&v| v > 1).collect::<Vec<_>>().len()
 }
 
-// fn part2() {}
+fn part2(path: &str) -> usize {
+    let rows = read_lines(path)
+        .iter()
+        .fold(HashMap::new(), |mut hash, line| {
+            if line.origin.0 == line.end.0 {
+                let begin = min(line.origin.1, line.end.1);
+                let end = max(line.origin.1, line.end.1) + 1;
+                for i in begin..end {
+                    let count = hash.entry((line.origin.0, i)).or_insert(0);
+                    *count += 1;
+                }
+            } else if line.origin.1 == line.end.1 {
+                let begin = min(line.origin.0, line.end.0);
+                let end = max(line.origin.0, line.end.0) + 1;
+                for i in begin..end {
+                    let count = hash.entry((i, line.origin.1)).or_insert(0);
+                    *count += 1;
+                }
+            } else {
+                let diff_x = line.end.0 - line.origin.0;
+                let diff_y = line.end.1 - line.origin.1;
+                if (diff_x / diff_y).abs() == 1 {
+                    let step_x = if diff_x > 0 { 1 } else { -1 };
+                    let step_y = if diff_y > 0 { 1 } else { -1 };
+                    for step in 0..diff_x.abs() + 1 {
+                        let count = hash
+                            .entry((line.origin.0 + step * step_x, line.origin.1 + step * step_y))
+                            .or_insert(0);
+                        *count += 1;
+                    }
+                }
+            }
+            hash
+        });
+    rows.values().filter(|&&v| v > 1).collect::<Vec<_>>().len()
+}
 
 fn main() {
-    assert_eq!(part1("fixtures/day5-test.txt"), 5);
-    // println!("{:?}", part1("fixtures/day5.txt"));
+    println!("The Result for Part 1 is: {:?}", part1("fixtures/day5.txt"));
+    println!("The Result for Part 2 is: {:?}", part2("fixtures/day5.txt"));
 }
 
 #[cfg(test)]
@@ -90,6 +118,6 @@ mod testing {
 
     #[test]
     fn test_part2() {
-        // assert_eq!(part1("fixtures/day5-test.txt"), 5);
+        assert_eq!(part2("fixtures/day5-test.txt"), 12);
     }
 }
