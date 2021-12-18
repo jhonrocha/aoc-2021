@@ -1,15 +1,21 @@
-use std::collections::VecDeque;
+use aoc::read_lines_split;
 
-use aoc::{read_lines, read_lines_split};
-
-fn part1(path: &str) -> u64 {
-    let lines: Vec<Vec<u64>> = read_lines_split(path, |line| {
-        Ok(line.split_whitespace().map(|f| f.parse::<u64>().unwrap()))
+fn part1(path: &str) -> u32 {
+    let a = "a";
+    let lines: Vec<Vec<u32>> = read_lines_split(path, |line| {
+        Some(line.split(',').map(|f| f.parse::<u32>().unwrap()).collect())
     })
     .unwrap();
-    println!("{:?}", lines);
-
-    0
+    let min = *lines[0].iter().min().unwrap();
+    let max = *lines[0].iter().max().unwrap();
+    (min..max)
+        .map(|pos| {
+            lines[0]
+                .iter()
+                .fold(0, |acc, &fish| acc + (fish as i32 - pos as i32).abs())
+        })
+        .min()
+        .unwrap() as u32
 }
 
 fn part2(path: &str) -> u64 {
