@@ -20,3 +20,14 @@ where
         .map(|l| l.chars().filter_map(|c| f(c)).collect())
         .collect::<Vec<Vec<T>>>())
 }
+
+pub fn read_lines_split<T, F>(path: &str, f: F) -> Result<Vec<Vec<T>>, Box<dyn Error>>
+where
+    T: FromStr,
+    F: Fn(&str) -> Option<Vec<T>>,
+{
+    Ok(read_to_string(path)?
+        .lines()
+        .filter_map(f)
+        .collect::<Vec<Vec<T>>>())
+}
