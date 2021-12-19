@@ -1,25 +1,27 @@
 use aoc::read_lines_split;
 
-fn part1(path: &str) -> u32 {
-    let a = "a";
-    let lines: Vec<Vec<u32>> = read_lines_split(path, |line| {
-        Some(line.split(',').map(|f| f.parse::<u32>().unwrap()).collect())
+fn sort_crabs_cost(path: &str, fuel: fn(i32, i32) -> i32) -> i32 {
+    let lines: Vec<Vec<i32>> = read_lines_split(path, |line| {
+        Some(line.split(',').map(|f| f.parse::<i32>().unwrap()).collect())
     })
     .unwrap();
     let min = *lines[0].iter().min().unwrap();
     let max = *lines[0].iter().max().unwrap();
     (min..max)
-        .map(|pos| {
-            lines[0]
-                .iter()
-                .fold(0, |acc, &fish| acc + (fish as i32 - pos as i32).abs())
-        })
+        .map(|pos| lines[0].iter().fold(0, |acc, &fish| acc + fuel(fish, pos)))
         .min()
-        .unwrap() as u32
+        .unwrap() as i32
 }
 
-fn part2(path: &str) -> u64 {
-    0
+fn part1(path: &str) -> i32 {
+    sort_crabs_cost(path, |fish, pos| (fish - pos).abs())
+}
+
+fn part2(path: &str) -> i32 {
+    sort_crabs_cost(path, |fish, pos| {
+        let dist = (fish - pos).abs() as f64;
+        ((dist + 1.0) * (dist / 2.0)) as i32
+    })
 }
 
 fn main() {
@@ -36,7 +38,8 @@ mod tests {
         assert_eq!(part1("fixtures/day7-test.txt"), 37);
     }
 
-    // #[test]
-    // fn test_part2() {
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2("fixtures/day7-test.txt"), 168);
+    }
 }
