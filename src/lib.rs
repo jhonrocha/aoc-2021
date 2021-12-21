@@ -17,7 +17,7 @@ where
 {
     Ok(read_to_string(path)?
         .lines()
-        .map(|l| l.chars().filter_map(|c| f(c)).collect())
+        .map(|l| l.chars().filter_map(&f).collect())
         .collect::<Vec<Vec<T>>>())
 }
 

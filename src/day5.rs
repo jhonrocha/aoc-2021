@@ -1,4 +1,3 @@
-
 use std::{
     cmp::{max, min},
     collections::HashMap,
@@ -20,7 +19,7 @@ impl FromStr for Line {
         let points = s
             .split(" -> ")
             .map(|v| {
-                let nums: Vec<&str> = v.split(",").collect();
+                let nums: Vec<&str> = v.split(',').collect();
                 (
                     nums[0].parse::<isize>().unwrap(),
                     nums[1].parse::<isize>().unwrap(),
@@ -63,7 +62,7 @@ fn part1(path: &str) -> usize {
             }
             hash
         });
-    rows.values().filter(|&&v| v > 1).collect::<Vec<_>>().len()
+    rows.values().filter(|&&v| v > 1).count()
 }
 
 fn part2(path: &str) -> usize {
@@ -100,7 +99,7 @@ fn part2(path: &str) -> usize {
             }
             hash
         });
-    rows.values().filter(|&&v| v > 1).collect::<Vec<_>>().len()
+    rows.values().filter(|&&v| v > 1).count()
 }
 
 fn main() {
