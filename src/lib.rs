@@ -1,4 +1,7 @@
-use std::{error::Error, fs::read_to_string, str::FromStr, collections::VecDeque};
+use std::{collections::VecDeque, error::Error, fs::read_to_string, str::FromStr};
+
+// Ok(1).ok();
+// Some(1).ok_or(err)
 
 pub fn read_lines<T>(path: &str) -> Result<Vec<T>, Box<dyn Error>>
 where
@@ -34,7 +37,6 @@ where
 
 pub fn read_lines_split<T, F>(path: &str, f: F) -> Result<Vec<Vec<T>>, Box<dyn Error>>
 where
-    T: FromStr,
     F: Fn(&str) -> Option<Vec<T>>,
 {
     Ok(read_to_string(path)?
