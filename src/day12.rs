@@ -155,7 +155,7 @@ mod tests {
     #[test]
     fn test_part2() {
         assert_eq!(part2("fixtures/day12-test.txt"), 36);
-        // assert_eq!(part2("fixtures/day12-test2.txt"), 103);
-        // assert_eq!(part2("fixtures/day12-test3.txt"), 3509);
+        assert_eq!(part2("fixtures/day12-test2.txt"), 103);
+        assert_eq!(part2("fixtures/day12-test3.txt"), 3509);
     }
 }
