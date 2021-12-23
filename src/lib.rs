@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, error::Error, fs::read_to_string, str::FromStr};
+use std::{collections::VecDeque, error::Error, fs::read_to_string, str::FromStr, fmt::Debug};
 
 // Ok(1).ok();
 // Some(1).ok_or(err)
@@ -43,4 +43,31 @@ where
         .lines()
         .filter_map(f)
         .collect::<Vec<Vec<T>>>())
+}
+
+pub fn read_two_splits<T, K, F, S>(
+    path: &str,
+    split: &str,
+    f1: F,
+    f2: S,
+) -> Result<(Vec<T>, Vec<K>), Box<dyn Error>>
+where
+    F: Fn(&str) -> Option<T>,
+    S: Fn(&str) -> Option<K>,
+{
+    // Read the file
+    let file = read_to_string(path).expect("missing file");
+    let parts: Vec<&str> = file.split(split).collect();
+    Ok((
+        parts.first().unwrap().lines().filter_map(f1).collect(),
+        parts.last().unwrap().lines().filter_map(f2).collect(),
+    ))
+}
+
+pub fn print_iter<T>(it: T)
+where
+    T: std::iter::Iterator,
+    <T as Iterator>::Item: Debug,
+{
+    it.for_each(|v| println!("{:?}", v));
 }
