@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use aoc::read_two_splits;
 
-fn set_from_template(pairs: &[String]) -> HashMap<String, u32> {
-    let mut map = HashMap::<String, u32>::new();
+fn set_from_template(pairs: &[String]) -> HashMap<String, u64> {
+    let mut map = HashMap::<String, u64>::new();
     pairs.iter().for_each(|pair| {
         let v = map.entry(pair.clone()).or_insert(0);
         *v += 1;
@@ -19,25 +19,32 @@ fn set_from_rules(rules: &[(String, Vec<String>)]) -> HashMap<String, Vec<String
     map
 }
 
-fn apply_step(rules: &HashMap<String, Vec<String>>, pairs: &mut HashMap<String, u32>) {
-    let keys = pairs.keys().cloned().collect::<Vec<String>>();
-    for key in keys {
+fn apply_step(rules: &HashMap<String, Vec<String>>, pairs: &mut HashMap<String, u64>) {
+    let keys = pairs.clone();
+    // Pairs on the hash
+    for (key, value) in keys {
+        // Targets from the rules for each pair
         if let Some(targets) = rules.get(&key) {
+            // For each target
             targets.iter().for_each(|t| {
+                // Incr it on the pair list
                 let p = pairs.entry(t.clone()).or_insert(0);
-                *p += 1;
-                let v = pairs.get_mut(&key).unwrap();
-                if *v > 1 {
-                    *v -= 1
+                *p += value;
+            });
+            // Decr the current key
+            if let Some(v) = pairs.get_mut(&key) {
+                // If key, add it to 1
+                if *v > value {
+                    *v -= value
                 } else {
                     pairs.remove(&key);
                 }
-            });
+            }
         }
     }
 }
 
-fn part1(path: &str, steps: u32) -> u32 {
+fn part1(path: &str, steps: u64) -> u64 {
     // Read the file
     let (template, rules) = read_two_splits(
         path,
@@ -56,37 +63,61 @@ fn part1(path: &str, steps: u32) -> u32 {
             )
         },
         |line| {
-            let r: Vec<String> = line.split(" -> ").take(1).map(String::from).collect();
-            let results = line.replace(" -> ", "");
-            let results = vec![results[..2].to_string(), results[1..].to_string()];
-            Some((r.first().unwrap().to_owned(), results))
+            let letters: Vec<char> = line.replace(" -> ", "").chars().collect();
+            let (c1, c2, c3) = (
+                letters.get(0).unwrap(),
+                letters.get(1).unwrap(),
+                letters.get(2).unwrap(),
+            );
+            let mut pair = c1.to_string();
+            pair.push(*c2);
+            let mut comb1 = c1.to_string();
+            comb1.push(*c3);
+            let mut comb2 = c3.to_string();
+            comb2.push(*c2);
+
+            Some((pair, vec![comb1, comb2]))
         },
     )
     .unwrap();
     let mut template = set_from_template(template.first().unwrap());
-    println!("{:?}", template);
     let rules = set_from_rules(&rules);
-    println!("{:?}", rules);
     for _ in 0..steps {
         apply_step(&rules, &mut template);
     }
-    println!("{:?}", template);
-    0
+    let mut max_count = 0;
+    let mut min_count = u64::MAX;
+    template
+        .iter()
+        .fold(HashMap::new(), |mut hash, (key, value)| {
+            key.chars().for_each(|c| {
+                let v = hash.entry(c).or_insert(0);
+                *v += value;
+            });
+            hash
+        })
+        .values()
+        .for_each(|v| {
+            let v = if v % 2 == 0 { v / 2 } else { v / 2 + 1 };
+            if v > max_count {
+                max_count = v
+            }
+            if v < min_count {
+                min_count = v
+            }
+        });
+    max_count - min_count
 }
-
-// fn part2(path: &str) -> u32 {
-// }
 
 fn main() {
     println!(
         "Results for Part1 are: {:?}",
-        part1("fixtures/day14.txt", 1)
+        part1("fixtures/day14.txt", 10)
     );
-    // println!(
-    //     "Results for Part2 are: {:?}",
-    //     part2("fixtures/day14-test.txt")
-    // );
-    // println!("Results for Part2 are: {:?}", part2("fixtures/day14.txt"));
+    println!(
+        "Results for Part2 are: {:?}",
+        part1("fixtures/day14.txt", 40)
+    );
 }
 
 #[cfg(test)]
@@ -95,11 +126,11 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1("fixtures/day14-test.txt", 1), 17);
+        assert_eq!(part1("fixtures/day14-test.txt", 10), 1588);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2("fixtures/day14-test.txt"), 16);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part1("fixtures/day14-test.txt", 40), 2188189693529);
+    }
 }
