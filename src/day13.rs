@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-use aoc::{print_iter, read_two_splits};
+use aoc::read_two_splits;
 
 enum Fold {
     Y(u32),
@@ -102,7 +102,6 @@ fn print_set(set: &HashSet<Point>) {
             max_y = y
         };
     });
-    // print_iter(set.iter());
     for y in 0..=max_y {
         for x in 0..=max_x {
             if set.contains(&Point { x, y }) {

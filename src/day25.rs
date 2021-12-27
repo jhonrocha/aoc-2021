@@ -2,7 +2,12 @@ use std::{collections::HashSet, fs::read_to_string};
 
 use aoc::Point;
 
-fn step(east: &mut HashSet<Point>, south: &mut HashSet<Point>, lines: u32, columns: u32) -> u32 {
+fn step(
+    east: &mut HashSet<Point>,
+    south: &mut HashSet<Point>,
+    lines: usize,
+    columns: usize,
+) -> usize {
     let mut changes = 0;
     let keys = east.clone();
     keys.iter().for_each(|p| {
@@ -31,8 +36,8 @@ fn part1(path: &str) -> u64 {
     let mut east = HashSet::<Point>::new();
     let mut south = HashSet::<Point>::new();
     let file = read_to_string(path).unwrap();
-    let mut lines = 0;
-    let mut columns = 0;
+    let mut lines: usize = 0;
+    let mut columns: usize = 0;
     file.lines().enumerate().for_each(|(y, line)| {
         lines += 1;
         line.chars().enumerate().for_each(|(x, c)| {
@@ -40,14 +45,8 @@ fn part1(path: &str) -> u64 {
                 columns += 1;
             }
             match c {
-                'v' => south.insert(Point {
-                    x: x as u32,
-                    y: y as u32,
-                }),
-                '>' => east.insert(Point {
-                    x: x as u32,
-                    y: y as u32,
-                }),
+                'v' => south.insert(Point { x, y }),
+                '>' => east.insert(Point { x, y }),
                 _ => true,
             };
         })

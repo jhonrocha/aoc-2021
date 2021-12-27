@@ -1,12 +1,32 @@
-use std::{collections::VecDeque, error::Error, fs::read_to_string, str::FromStr, fmt::Debug};
+use std::{collections::VecDeque, error::Error, fmt::Debug, fs::read_to_string, str::FromStr};
 
-// Ok(1).ok();
-// Some(1).ok_or(err)
-
-#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Point {
-    pub x: u32,
-    pub y: u32,
+    pub x: usize,
+    pub y: usize,
+}
+
+impl Point {
+    pub fn new(x: usize, y: usize) -> Point {
+        Point { x, y }
+    }
+}
+
+pub fn cardinal_dirs(p: Point, lines: usize, columns: usize) -> Vec<Point> {
+    let mut coords = Vec::<Point>::new();
+    if p.x > 0 {
+        coords.push(Point::new(p.x - 1, p.y));
+    }
+    if p.x < (lines - 1) {
+        coords.push(Point::new(p.x + 1, p.y));
+    }
+    if p.y > 0 {
+        coords.push(Point::new(p.x, p.y - 1));
+    }
+    if p.y < (columns - 1) {
+        coords.push(Point::new(p.x, p.y + 1));
+    }
+    coords
 }
 
 pub fn read_lines<T>(path: &str) -> Result<Vec<T>, Box<dyn Error>>
