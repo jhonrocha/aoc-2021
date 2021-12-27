@@ -3,6 +3,12 @@ use std::{collections::VecDeque, error::Error, fs::read_to_string, str::FromStr,
 // Ok(1).ok();
 // Some(1).ok_or(err)
 
+#[derive(PartialEq, Eq, Hash, Debug, Clone)]
+pub struct Point {
+    pub x: u32,
+    pub y: u32,
+}
+
 pub fn read_lines<T>(path: &str) -> Result<Vec<T>, Box<dyn Error>>
 where
     T: FromStr,
