@@ -39,6 +39,19 @@ where
         .collect::<Vec<T>>())
 }
 
+/// Apply filter_map each char of every line
+///
+/// # Arguments
+///
+/// * `path` - The file path
+/// * `f` - A function to parse each char returning an Option
+///
+/// # Examples
+///
+/// ```
+/// use aoc::read_lines_chars;
+/// let lines = read_lines_chars(path, |c| c.to_digit(10)).unwrap();
+/// ```
 pub fn read_lines_chars<T, F>(path: &str, f: F) -> Result<Vec<Vec<T>>, Box<dyn Error>>
 where
     T: FromStr,
