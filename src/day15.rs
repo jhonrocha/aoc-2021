@@ -37,7 +37,7 @@ fn part1(path: &str) -> u32 {
     while !unchecked.is_empty() {
         let pos = unchecked.pop().unwrap();
         count += 1;
-        for Point { x, y } in cardinal_dirs(pos, size, size) {
+        for Point { x, y } in cardinal_dirs(pos, size, size, false) {
             if x == 0 && y == 0 {
                 continue;
             }
@@ -63,7 +63,7 @@ fn dijkstra(lines: &[Vec<u32>], start: Point) -> u32 {
         // let State { point, cost: _ } = unchecked.pop().unwrap();
         let State { point, cost } = unchecked.pop().unwrap();
         count += 1;
-        for Point { x, y } in cardinal_dirs(point, size, size) {
+        for Point { x, y } in cardinal_dirs(point, size, size, false) {
             if x == 0 && y == 0 {
                 continue;
             }

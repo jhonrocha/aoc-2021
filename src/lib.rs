@@ -12,7 +12,7 @@ impl Point {
     }
 }
 
-pub fn cardinal_dirs(p: Point, lines: usize, columns: usize) -> Vec<Point> {
+pub fn cardinal_dirs(p: &Point, lines: usize, columns: usize, diagonal: bool) -> Vec<Point> {
     let mut coords = Vec::<Point>::new();
     if p.x > 0 {
         coords.push(Point::new(p.x - 1, p.y));
@@ -25,6 +25,24 @@ pub fn cardinal_dirs(p: Point, lines: usize, columns: usize) -> Vec<Point> {
     }
     if p.y < (columns - 1) {
         coords.push(Point::new(p.x, p.y + 1));
+    }
+    if diagonal {
+        if p.x > 0 {
+            if p.y > 0 {
+                coords.push(Point::new(p.x - 1, p.y - 1));
+            }
+            if p.y < (columns - 1) {
+                coords.push(Point::new(p.x - 1, p.y + 1));
+            }
+        }
+        if p.x < (lines - 1) {
+            if p.y > 0 {
+                coords.push(Point::new(p.x + 1, p.y - 1));
+            }
+            if p.y < (columns - 1) {
+                coords.push(Point::new(p.x + 1, p.y + 1));
+            }
+        }
     }
     coords
 }

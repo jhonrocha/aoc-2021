@@ -1,7 +1,6 @@
 use std::fs;
 
-#[allow(dead_code)]
-pub fn challenge1() {
+pub fn challenge1(filename: &str) {
     let content = fs::read_to_string("./day1-1.txt").expect("File not found");
     let mut entries: [isize; 3] = [0, 0, 0];
     let mut counter: isize = 0;
@@ -17,11 +16,11 @@ pub fn challenge1() {
     println!("{}", counter);
 }
 
-#[allow(dead_code)]
-pub fn challenge2() {
+pub fn challenge2(filename: &str) {
     let content = fs::read_to_string("./day1-1.txt").expect("File not found");
     let mut entries: [isize; 3] = [0, 0, 0];
     let mut counter: isize = 0;
+
     for (index, line) in content.lines().enumerate() {
         let value: isize = line.parse().expect("Line is not a number");
         if (index > 3) && (value > entries[0]) {
@@ -32,4 +31,9 @@ pub fn challenge2() {
         entries[2] = value;
     }
     println!("{}", counter);
+}
+
+fn main() {
+    challenge1("../fixtures/day1.txt");
+    challenge2("../fixtures/day1.txt");
 }
