@@ -1,6 +1,7 @@
 use std::{
     env,
     fs::{read_to_string, File},
+    io::{BufRead, BufReader},
     num::ParseIntError,
     str::FromStr,
 };
@@ -23,26 +24,31 @@ impl FromStr for Point {
     }
 }
 
-fn read_to_memory() {
-    let _pts: Vec<Point> = read_to_string("input.txt")
+fn read_to_memory() -> Vec<Point> {
+    read_to_string("input.txt")
         .expect("input.txt not found")
         .lines()
         .map(|line| line.parse::<Point>().unwrap())
-        .collect::<Vec<Point>>();
+        .collect::<Vec<Point>>()
 }
 
-fn read_to_buf() {
+fn read_to_buf() -> Vec<Point> {
     let input = File::open("input.txt");
-    let reader = BufReader::new();
-    for line in reader.lines() {}
+    let reader = BufReader::new(input.unwrap());
+    let mut points = Vec::<Point>::new();
+    for line in reader.lines() {
+        points.push(line.unwrap().parse::<Point>().unwrap())
+    }
+    points
 }
 
 fn main() {
-    println!("Hello, world!");
-    let bench = env::var("READ_STRATEGY").expect("set read_strategy");
+    let bench = env::var("READ_STRATEGY").expect("set READ_STRATEGY");
     if bench == "MEMORY" {
+        // println!("{:?}", read_to_memory());
         read_to_memory();
     } else {
+        // println!("{:?}", read_to_buf());
         read_to_buf();
     }
 }

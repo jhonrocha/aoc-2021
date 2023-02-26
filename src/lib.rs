@@ -1,4 +1,12 @@
-use std::{collections::VecDeque, error::Error, fmt::Debug, fs::{read_to_string, File}, str::FromStr, io::{BufReader, BufRead}};
+use std::{
+    collections::VecDeque,
+    error::Error,
+    fmt::Debug,
+    fs::{read_to_string, File},
+    io::{BufRead, BufReader},
+    num::ParseIntError,
+    str::FromStr,
+};
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Point {
@@ -9,6 +17,17 @@ pub struct Point {
 impl Point {
     pub fn new(x: usize, y: usize) -> Point {
         Point { x, y }
+    }
+}
+
+impl FromStr for Point {
+    type Err = ParseIntError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let values: Vec<usize> = s.split(" ").map(|v| v.parse::<usize>().unwrap()).collect();
+        Ok(Point {
+            x: values[0],
+            y: values[1],
+        })
     }
 }
 
@@ -129,11 +148,22 @@ where
     it.for_each(|v| println!("{:?}", v));
 }
 
-pub fn parse_file_lines(path: &str) {
+pub fn parse_file_lines<T, F>(path: &str, fun: F) -> Vec<T>
+where
+    F: Fn(String) -> T,
+{
     let f = File::open(path).expect("missing file");
     let reader = BufReader::new(f);
+    let mut resp: Vec<T> = Vec::new();
     for raw_line in reader.lines() {
         let line = raw_line.expect("failed to read the line");
-        println!("{}", line);
+        resp.push(fun(line));
     }
+    resp
+}
+
+pub fn file_lines_iter(path: &str) -> std::io::Lines<BufReader<File>> {
+    let f = File::open(path).expect("missing file");
+    let reader = BufReader::new(f);
+    reader.lines()
 }
