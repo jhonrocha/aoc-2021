@@ -1,4 +1,0 @@
-# C
-build/*
-!build/.gitkeep 
-.ccls-cache

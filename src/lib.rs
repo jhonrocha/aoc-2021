@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, error::Error, fmt::Debug, fs::read_to_string, str::FromStr};
+use std::{collections::VecDeque, error::Error, fmt::Debug, fs::{read_to_string, File}, str::FromStr, io::{BufReader, BufRead}};
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Point {
@@ -127,4 +127,13 @@ where
     <T as Iterator>::Item: Debug,
 {
     it.for_each(|v| println!("{:?}", v));
+}
+
+pub fn parse_file_lines(path: &str) {
+    let f = File::open(path).expect("missing file");
+    let reader = BufReader::new(f);
+    for raw_line in reader.lines() {
+        let line = raw_line.expect("failed to read the line");
+        println!("{}", line);
+    }
 }
