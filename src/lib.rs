@@ -1,7 +1,7 @@
 use std::{
     collections::VecDeque,
     error::Error,
-    fmt::Debug,
+    fmt::{Debug, Display},
     fs::{read_to_string, File},
     io::{BufRead, BufReader},
     num::ParseIntError,
@@ -31,6 +31,16 @@ impl FromStr for Point {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct LineParseError(pub String);
+
+impl Display for LineParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Parse line Error: {}", self.0)
+    }
+}
+
+impl Error for LineParseError {}
 pub fn cardinal_dirs(p: &Point, lines: usize, columns: usize, diagonal: bool) -> Vec<Point> {
     let mut coords = Vec::<Point>::new();
     if p.x > 0 {
@@ -148,16 +158,19 @@ where
     it.for_each(|v| println!("{:?}", v));
 }
 
-pub fn parse_file_lines<T, F>(path: &str, fun: F) -> Vec<T>
+pub fn parse_file_lines<T, F, E>(path: &str, fun: F) -> Vec<T>
 where
-    F: Fn(String) -> T,
+    F: Fn(String) -> Result<T, E>,
 {
     let f = File::open(path).expect("missing file");
     let reader = BufReader::new(f);
     let mut resp: Vec<T> = Vec::new();
     for raw_line in reader.lines() {
         let line = raw_line.expect("failed to read the line");
-        resp.push(fun(line));
+        match fun(line) {
+            Ok(v) => resp.push(v),
+            _ => continue,
+        }
     }
     resp
 }
