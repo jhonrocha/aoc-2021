@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 
 #[allow(dead_code)]
-pub fn part1(path: &str) -> u32 {
+pub fn challenge1(path: &str) -> u32 {
     let lines = read_to_string(path).expect("File not found");
     let (plays, boards) = lines.split_once("\n").expect("Wrong file");
     let plays: Vec<&str> = plays.split(",").collect();
@@ -33,8 +33,7 @@ pub fn part1(path: &str) -> u32 {
     winner
 }
 
-#[allow(dead_code)]
-pub fn part2(path: &str) -> u32 {
+pub fn challenge2(path: &str) -> u32 {
     let lines = read_to_string(path).expect("File not found");
     let (plays, boards) = lines.split_once("\n").expect("Wrong file");
     let plays: Vec<&str> = plays.split(",").collect();
@@ -43,10 +42,12 @@ pub fn part2(path: &str) -> u32 {
         .map(|b| b.trim().split_whitespace().collect())
         .collect();
     let mut winner: u32 = 0;
-    let mut ignore = Vec::<usize>::new();
+    let len = boards.len();
+    let mut ignore: Vec<bool> = vec![false; len];
+    let mut counter = 0;
     plays.iter().find(|&k| {
         for (n_pos, board) in boards.iter_mut().enumerate() {
-            if ignore.iter().find(|&&v| v == n_pos).is_some() {
+            if ignore[n_pos] {
                 continue;
             }
             let mut lines = vec![true; 5];
@@ -59,38 +60,42 @@ pub fn part2(path: &str) -> u32 {
                 col[idx / 5] = col[idx / 5] && (*hs == "-");
             }
             if lines.iter().find(|&l| *l).is_some() || col.iter().find(|&c| *c).is_some() {
-                winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
-                let mult: u32 = k.parse().unwrap();
-                winner *= mult;
-                ignore.push(n_pos);
+                ignore[n_pos] = true;
+                counter += 1;
+                if counter == len {
+                    winner = board.iter().filter_map(|el| el.parse::<u32>().ok()).sum();
+                    let mult: u32 = k.parse().unwrap();
+                    winner *= mult;
+                    return true;
+                }
             }
         }
-        false
+        return false;
     });
     winner
 }
 
+fn main() {
+    println!(
+        "Day 03 - Challenge 1 results: {:?}",
+        challenge1("fixtures/day04.txt")
+    );
+    println!(
+        "Day 03 - Challenge 2 results: {:?}",
+        challenge2("fixtures/day04.txt")
+    );
+}
+
 #[cfg(test)]
 mod anything {
-    // use super::{part1, part2};
+    // use super::{challenge1, challenge2};
     use super::*;
     #[test]
-    fn test_part1() {
-        assert_eq!(part1("fixtures/day4-test.txt"), 4512);
+    fn test_challenge1() {
+        assert_eq!(challenge1("fixtures/day04-test.txt"), 4512);
     }
-
     #[test]
-    fn run_part1() {
-        println!("Part1 result is {}", part1("fixtures/day4.txt"))
-    }
-
-    #[test]
-    fn test_part2() {
-        assert_eq!(part2("fixtures/day4-test.txt"), 1924);
-    }
-
-    #[test]
-    fn run_part2() {
-        println!("Part2 result is {}", part2("fixtures/day4.txt"))
+    fn test_challenge2() {
+        assert_eq!(challenge2("fixtures/day04-test.txt"), 1924);
     }
 }
