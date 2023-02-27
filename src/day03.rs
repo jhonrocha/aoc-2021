@@ -1,10 +1,9 @@
 use std::{
     char,
-    fs::File,
+    fs::{read_to_string, File},
     io::{BufRead, BufReader},
 };
 
-#[allow(dead_code)]
 fn bin_to_dec(value: &Vec<char>) -> usize {
     let mut resp: usize = 0;
     value.iter().rev().enumerate().for_each(|(index, v)| {
@@ -15,42 +14,41 @@ fn bin_to_dec(value: &Vec<char>) -> usize {
     resp
 }
 
-#[allow(dead_code)]
-pub fn part1(path: &str) -> usize {
-    let file = File::open(path).expect(&format!("Could not open file {}", path));
-    let reader = BufReader::new(file);
-    let mut columns = Vec::new();
-    let mut lines: usize = 0;
-    reader.lines().for_each(|line| {
-        let line = line.expect("Could not read a line");
-        line.chars().enumerate().for_each(|(index, val)| {
-            if val == '1' {
-                if columns.len() > index {
-                    columns[index] += 1;
-                } else {
-                    columns.push(1);
+pub fn challenge1(path: &str) -> usize {
+    let mut total = 0;
+    let mut gamma = 0;
+    let mut epsilon = 0;
+    read_to_string(path)
+        .expect("File is missing!")
+        .lines()
+        .into_iter()
+        .fold(Vec::<usize>::new(), |mut acc, line| {
+            line.chars().enumerate().for_each(|(idx, c)| {
+                if c == '1' {
+                    if let Some(v) = acc.get(idx) {
+                        acc[idx] = v + 1;
+                    } else {
+                        acc.push(1);
+                    }
                 }
+            });
+            total += 1;
+            acc
+        })
+        .into_iter()
+        .for_each(|occurrency| {
+            if occurrency > total / 2 {
+                gamma = (gamma << 1) + 1;
+                epsilon = epsilon << 1;
+            } else {
+                gamma = gamma << 1;
+                epsilon = (epsilon << 1) + 1;
             }
         });
-        lines += 1;
-    });
-    let mut gamma: usize = 0;
-    let mut epsilon = 0;
-    let lines = lines / 2;
-    columns.iter().rev().enumerate().for_each(|(index, v)| {
-        if v >= &lines {
-            // Column index major is 1
-            gamma += (2 as usize).pow(index as u32);
-        } else {
-            // Column index major is 0
-            epsilon += (2 as usize).pow(index as u32);
-        }
-    });
     gamma * epsilon
 }
 
-#[allow(dead_code)]
-pub fn part2(path: &str) -> usize {
+pub fn challenge2(path: &str) -> usize {
     let file = File::open(path).expect(&format!("Could not open file {}", path));
     let reader = BufReader::new(file);
     let mut oxygen: Vec<Vec<char>> = reader
@@ -100,27 +98,28 @@ pub fn part2(path: &str) -> usize {
     co2 * oxygen
 }
 
+fn main() {
+    println!(
+        "Day 03 - Challenge 1 results: {:?}",
+        challenge1("fixtures/day03.txt")
+    );
+    println!(
+        "Day 03 - Challenge 2 results: {:?}",
+        challenge2("fixtures/day03.txt")
+    );
+}
+
 #[cfg(test)]
 mod anything {
-    // use super::{part1, part2};
+    // use super::{challenge1, challenge2};
     use super::*;
     #[test]
-    fn test_part1() {
-        assert_eq!(part1("./src/day3/test.txt"), 198);
+    fn test_challenge1() {
+        assert_eq!(challenge1("fixtures/day03-test.txt"), 198);
     }
 
     #[test]
-    fn run_part1() {
-        println!("Part1 result is {}", part1("./src/day3/input.txt"))
-    }
-
-    #[test]
-    fn test_part2() {
-        assert_eq!(part2("./src/day3/test.txt"), 230);
-    }
-
-    #[test]
-    fn run_part2() {
-        println!("Part2 result is {}", part2("./src/day3/input.txt"))
+    fn test_challenge2() {
+        assert_eq!(challenge2("fixtures/day03-test.txt"), 230);
     }
 }
