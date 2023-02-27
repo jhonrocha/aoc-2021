@@ -1,9 +1,4 @@
-use std::{
-    error::Error,
-    fs::File,
-    io::{BufRead, BufReader},
-    str::FromStr,
-};
+use std::{error::Error, str::FromStr};
 
 use aoc::{self, Point};
 
@@ -13,6 +8,18 @@ enum Directions {
     DOWN(usize),
     FORWARD(usize),
     BACKWARDS(usize),
+}
+
+#[derive(Debug)]
+struct PointsAim {
+    x: usize,
+    y: usize,
+    aim: usize,
+}
+impl PointsAim {
+    fn new(x: usize, y: usize, aim: usize) -> PointsAim {
+        PointsAim { x, y, aim }
+    }
 }
 
 impl FromStr for Directions {
@@ -28,7 +35,6 @@ impl FromStr for Directions {
     }
 }
 
-#[allow(dead_code)]
 pub fn challenge1(path: &str) -> usize {
     let pos = aoc::parse_file_lines(path, |line| line.parse::<Directions>())
         .iter()
@@ -44,33 +50,33 @@ pub fn challenge1(path: &str) -> usize {
     pos.x * pos.y
 }
 
-#[allow(dead_code)]
-pub fn challenge2(path: &str) -> isize {
-    let f = File::open(path).expect(&format!("Could no open file {}", path));
-    let reader = BufReader::new(f);
-    // Directions: (horizontal, depth, aim)
-    let mut directions: (isize, isize, isize) = (0, 0, 0);
-    for l in reader.lines() {
-        let line = l.expect("missing line");
-        match line.split(" ").collect::<Vec<&str>>()[..] {
-            ["down", v] => directions.2 += v.parse::<isize>().unwrap(),
-            ["up", v] => directions.2 -= v.parse::<isize>().unwrap(),
-            ["forward", v] => {
-                let x = v.parse::<isize>().unwrap();
-                directions.0 += x;
-                directions.1 += directions.2 * x;
-            }
-            _ => (),
-        };
-    }
-    directions.0 * directions.1
+pub fn challenge2(path: &str) -> usize {
+    let pos = aoc::parse_file_lines(path, |line| line.parse::<Directions>())
+        .iter()
+        .fold(PointsAim::new(0, 0, 0), |mut p, dir| {
+            match dir {
+                Directions::UP(v) => p.aim -= v,
+                Directions::DOWN(v) => p.aim += v,
+                Directions::FORWARD(v) => {
+                    p.x += v;
+                    p.y += p.aim * v;
+                }
+                Directions::BACKWARDS(v) => p.x -= v,
+            };
+            p
+        });
+    pos.x * pos.y
 }
 
 fn main() {
     println!(
         "Day 02 - Challenge 1 results: {:?}",
         challenge1("fixtures/day02.txt")
-    )
+    );
+    println!(
+        "Day 02 - Challenge 2 results: {:?}",
+        challenge2("fixtures/day02.txt")
+    );
 }
 
 #[cfg(test)]
@@ -83,8 +89,8 @@ mod day2test {
         assert_eq!(challenge1("fixtures/day02-test.txt"), 150);
     }
 
-    // #[test]
-    // fn test_challenge2() {
-    //     assert_eq!(challenge2("fixtures/day01-test.txt"), 900);
-    // }
+    #[test]
+    fn test_challenge2() {
+        assert_eq!(challenge2("fixtures/day02-test.txt"), 900);
+    }
 }
