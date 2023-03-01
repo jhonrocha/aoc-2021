@@ -77,11 +77,11 @@ pub fn challenge2(path: &str) -> u32 {
 
 fn main() {
     println!(
-        "Day 03 - Challenge 1 results: {:?}",
+        "Day 04 - Challenge 1 results: {:?}",
         challenge1("fixtures/day04.txt")
     );
     println!(
-        "Day 03 - Challenge 2 results: {:?}",
+        "Day 04 - Challenge 2 results: {:?}",
         challenge2("fixtures/day04.txt")
     );
 }

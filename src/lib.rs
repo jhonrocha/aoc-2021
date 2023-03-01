@@ -10,12 +10,12 @@ use std::{
 
 #[derive(PartialEq, Eq, Hash, Debug, Clone, Copy)]
 pub struct Point {
-    pub x: usize,
-    pub y: usize,
+    pub x: isize,
+    pub y: isize,
 }
 
 impl Point {
-    pub fn new(x: usize, y: usize) -> Point {
+    pub fn new(x: isize, y: isize) -> Point {
         Point { x, y }
     }
 }
@@ -23,7 +23,7 @@ impl Point {
 impl FromStr for Point {
     type Err = ParseIntError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let values: Vec<usize> = s.split(" ").map(|v| v.parse::<usize>().unwrap()).collect();
+        let values: Vec<isize> = s.split(" ").map(|v| v.parse::<isize>().unwrap()).collect();
         Ok(Point {
             x: values[0],
             y: values[1],
@@ -46,13 +46,13 @@ pub fn cardinal_dirs(p: &Point, lines: usize, columns: usize, diagonal: bool) ->
     if p.x > 0 {
         coords.push(Point::new(p.x - 1, p.y));
     }
-    if p.x < (lines - 1) {
+    if p.x < (lines as isize - 1) {
         coords.push(Point::new(p.x + 1, p.y));
     }
     if p.y > 0 {
         coords.push(Point::new(p.x, p.y - 1));
     }
-    if p.y < (columns - 1) {
+    if p.y < (columns as isize - 1) {
         coords.push(Point::new(p.x, p.y + 1));
     }
     if diagonal {
@@ -60,15 +60,15 @@ pub fn cardinal_dirs(p: &Point, lines: usize, columns: usize, diagonal: bool) ->
             if p.y > 0 {
                 coords.push(Point::new(p.x - 1, p.y - 1));
             }
-            if p.y < (columns - 1) {
+            if p.y < (columns as isize - 1) {
                 coords.push(Point::new(p.x - 1, p.y + 1));
             }
         }
-        if p.x < (lines - 1) {
+        if p.x < (lines as isize - 1) {
             if p.y > 0 {
                 coords.push(Point::new(p.x + 1, p.y - 1));
             }
-            if p.y < (columns - 1) {
+            if p.y < (columns as isize - 1) {
                 coords.push(Point::new(p.x + 1, p.y + 1));
             }
         }
